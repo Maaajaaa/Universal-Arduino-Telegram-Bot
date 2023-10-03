@@ -106,6 +106,17 @@ public:
                    bool disable_notification = false,
                    int reply_to_message_id = 0, const String& keyboard = "");
 
+  String sendPostDocument(JsonObject payload);
+  String sendDocumentByBinary(const String& chat_id, const String& contentType, int fileSize,
+                           MoreDataAvailable moreDataAvailableCallback,
+                           GetNextByte getNextByteCallback, 
+                           GetNextBuffer getNextBufferCallback, 
+                           GetNextBufferLen getNextBufferLenCallback);
+  String sendDocument(const String& chat_id, const String& photo, const String& caption = "",
+                   bool disable_notification = false,
+                   int reply_to_message_id = 0, const String& keyboard = "");
+
+
   bool answerCallbackQuery(const String &query_id,
                            const String &text = "",
                            bool show_alert = false,

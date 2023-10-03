@@ -726,6 +726,78 @@ String UniversalTelegramBot::sendPhoto(const String& chat_id, const String& phot
   return sendPostPhoto(payload.as<JsonObject>());
 }
 
+String UniversalTelegramBot::sendPostDocument(JsonObject payload) {
+
+  bool sent = false;
+  String response = "";
+  #ifdef TELEGRAM_DEBUG  
+    Serial.println(F("sendPostDocument: SEND Post Photo"));
+  #endif
+  unsigned long sttime = millis();
+
+  if (payload.containsKey("document")) {
+    while (millis() - sttime < 8000ul) { // loop for a while to send the message
+      response = sendPostToTelegram(BOT_CMD("sendDocument"), payload);
+      #ifdef TELEGRAM_DEBUG  
+        Serial.println(response);
+      #endif
+      sent = checkForOkResponse(response);
+      if (sent) break;
+      
+    }
+  }
+
+  closeClient();
+  return response;
+}
+
+String UniversalTelegramBot::sendDocumentByBinary(
+    const String& chat_id, const String& contentType, int fileSize,
+    MoreDataAvailable moreDataAvailableCallback,
+    GetNextByte getNextByteCallback, GetNextBuffer getNextBufferCallback, GetNextBufferLen getNextBufferLenCallback) {
+
+  #ifdef TELEGRAM_DEBUG  
+    Serial.println(F("sendDocumentByBinary: SEND Photo"));
+  #endif
+
+  String response = sendMultipartFormDataToTelegram("sendDocument", "document", "doc.txt",
+    contentType, chat_id, fileSize,
+    moreDataAvailableCallback, getNextByteCallback, getNextBufferCallback, getNextBufferLenCallback);
+
+  #ifdef TELEGRAM_DEBUG  
+    Serial.println(response);
+  #endif
+
+  return response;
+}
+
+String UniversalTelegramBot::sendDocument(const String& chat_id, const String& document,
+                                       const String& caption,
+                                       bool disable_notification,
+                                       int reply_to_message_id,
+                                       const String& keyboard) {
+
+  DynamicJsonDocument payload(maxMessageLength);
+  payload["chat_id"] = chat_id;
+  payload["document"] = document;
+
+  if (caption.length() > 0)
+      payload["caption"] = caption;
+
+  if (disable_notification)
+      payload["disable_notification"] = disable_notification;
+
+  if (reply_to_message_id && reply_to_message_id != 0)
+      payload["reply_to_message_id"] = reply_to_message_id;
+
+  if (keyboard.length() > 0) {
+    JsonObject replyMarkup = payload.createNestedObject("reply_markup");
+    replyMarkup["keyboard"] = serialized(keyboard);
+  }
+
+  return sendPostDocument(payload.as<JsonObject>());
+}
+
 bool UniversalTelegramBot::checkForOkResponse(const String& response) {
   int last_id;
   DynamicJsonDocument doc(response.length());
