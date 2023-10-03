@@ -112,7 +112,7 @@ public:
                            GetNextByte getNextByteCallback, 
                            GetNextBuffer getNextBufferCallback, 
                            GetNextBufferLen getNextBufferLenCallback);
-  String sendDocument(const String& chat_id, const String& photo, const String& caption = "",
+  String sendDocument(const String& chat_id, const String& document, const String& caption = "",
                    bool disable_notification = false,
                    int reply_to_message_id = 0, const String& keyboard = "");
 
