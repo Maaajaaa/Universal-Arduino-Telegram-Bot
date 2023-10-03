@@ -79,7 +79,11 @@ public:
                                   MoreDataAvailable moreDataAvailableCallback,
                                   GetNextByte getNextByteCallback, 
                                   GetNextBuffer getNextBufferCallback, 
-                                  GetNextBufferLen getNextBufferLenCallback);
+                                  GetNextBufferLen getNextBufferLenCallback);                            
+  String
+  sendMultipartFormDataToTelegram(const String& command, const String& binaryPropertyName,
+                                  const String& fileName, const String& contentType,
+                                  const String& chat_id, File file);
 
   bool readHTTPAnswer(String &body, String &headers);
   bool getMe();

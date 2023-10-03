@@ -299,6 +299,108 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
   return body;
 }
 
+String UniversalTelegramBot::sendMultipartFormDataToTelegram(
+    const String& command, const String& binaryPropertyName, const String& fileName,
+    const String& contentType, const String& chat_id, File file) {
+
+  String body;
+  String headers;
+  
+  const String boundary = F("------------------------b8f610217e83e29b");
+
+  // Connect with api.telegram.org if not already connected
+  if (!client->connected()) {
+    #ifdef TELEGRAM_DEBUG  
+        Serial.println(F("[BOT Client]Connecting to server"));
+    #endif
+    if (!client->connect(TELEGRAM_HOST, TELEGRAM_SSL_PORT)) {
+      #ifdef TELEGRAM_DEBUG  
+        Serial.println(F("[BOT Client]Conection error"));
+      #endif
+    }
+  }
+  if (client->connected()) {
+    String start_request;
+    String end_request;
+    
+
+    start_request += F("--");
+    start_request += boundary;
+    start_request += F("\r\ncontent-disposition: form-data; name=\"chat_id\"\r\n\r\n");
+    start_request += chat_id;
+    start_request += F("\r\n" "--");
+    start_request += boundary;
+    start_request += F("\r\ncontent-disposition: form-data; name=\"");
+    start_request += binaryPropertyName;
+    start_request += F("\"; filename=\"");
+    start_request += fileName;
+    start_request += F("\"\r\n" "Content-Type: ");
+    start_request += contentType;
+    start_request += F("\r\n" "\r\n");
+
+    end_request += F("\r\n" "--");
+    end_request += boundary;
+    end_request += F("--" "\r\n");
+
+    client->print(F("POST /"));
+    client->print(buildCommand(command));
+    client->println(F(" HTTP/1.1"));
+    // Host header
+    client->println(F("Host: " TELEGRAM_HOST)); // bugfix - https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot/issues/186
+    client->println(F("User-Agent: arduino/1.0"));
+    client->println(F("Accept: */*"));
+
+    int contentLength = file.size() + start_request.length() + end_request.length();
+    #ifdef TELEGRAM_DEBUG  
+        Serial.println("Content-Length: " + String(contentLength));
+    #endif
+    client->print(F("Content-Length: "));
+    client->println(String(contentLength));
+    client->print(F("Content-Type: multipart/form-data; boundary="));
+    client->println(boundary);
+    client->println();
+    client->print(start_request);
+
+    #ifdef TELEGRAM_DEBUG  
+     Serial.print("Start request: " + start_request);
+    #endif
+
+    #ifdef TELEGRAM_DEBUG  
+        Serial.println(F("Sending photo by binary"));
+    #endif
+    byte buffer[512];
+    int count = 0;
+    while (file.available()) {
+        buffer[count] = file.read();
+        count++;
+        if (count == 512) {
+            // yield();
+            #ifdef TELEGRAM_DEBUG  
+                Serial.println(F("Sending binary photo full buffer"));
+            #endif
+            client->write((const uint8_t *)buffer, 512);
+            count = 0;
+        }
+    }
+    
+    if (count > 0) {
+        #ifdef TELEGRAM_DEBUG  
+            Serial.println(F("Sending binary photo remaining buffer"));
+        #endif
+        client->write((const uint8_t *)buffer, count);
+    }
+
+    client->print(end_request);
+    #ifdef TELEGRAM_DEBUG  
+        Serial.print("End request: " + end_request);
+    #endif
+    readHTTPAnswer(body, headers);
+  }
+
+  closeClient();
+  return body;
+}
+
 
 bool UniversalTelegramBot::getMe() {
   String response = sendGetToTelegram(BOT_CMD("getMe")); // receive reply from telegram.org
