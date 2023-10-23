@@ -476,7 +476,7 @@ int UniversalTelegramBot::getUpdates(long offset) {
     #endif
     // close the client as there's nothing to do with an empty string
     closeClient();
-    return 0;
+    return -1;
   } else {
     #ifdef TELEGRAM_DEBUG  
       Serial.print(F("incoming message length "));
