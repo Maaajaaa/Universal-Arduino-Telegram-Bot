@@ -86,6 +86,10 @@ public:
                                   const String& fileName, const String& contentType,
                                   const String& chat_id, File file);
 
+  String UniversalTelegramBot::sendMultipartFormDataToTelegram(
+    const String& command, const String& binaryPropertyName, const String& fileName,
+    const String& contentType, const String& chat_id, const char content*) 
+
   bool readHTTPAnswer(String &body, String &headers);
   bool getMe();
 
