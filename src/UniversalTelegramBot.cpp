@@ -475,7 +475,7 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
     #endif
     byte buffer[512];
     while (sizeof(content)) {
-        *(char*)buffer = 0;
+        *(byte*)buffer = 0;
         strncat(buffer, content, 512);
         #ifdef TELEGRAM_DEBUG  
             Serial.println(F("Sending binary photo full buffer"));
