@@ -406,7 +406,7 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
 
 String UniversalTelegramBot::sendMultipartFormDataToTelegram(
     const String& command, const String& binaryPropertyName, const String& fileName,
-    const String& contentType, const String& chat_id, const char content*) {
+    const String& contentType, const String& chat_id, const char content&) {
 
   String body;
   String headers;
@@ -455,7 +455,7 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
     client->println(F("User-Agent: arduino/1.0"));
     client->println(F("Accept: */*"));
 
-    int contentLength = size(content);
+    int contentLength = sizeof(content);
     #ifdef TELEGRAM_DEBUG  
         Serial.println("Content-Length: " + String(contentLength));
     #endif
@@ -473,21 +473,13 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
     #ifdef TELEGRAM_DEBUG  
         Serial.println(F("Sending multipar reqeuest by c-string"));
     #endif
-    while (file.available()) {
+    while (sizeof(content)) {
         *(char*)buffer = 0;
         strncat(buffer, content, 512);
         #ifdef TELEGRAM_DEBUG  
             Serial.println(F("Sending binary photo full buffer"));
         #endif
         client->write((const uint8_t *)buffer, 512);
-        }
-    }
-    
-    if (count > 0) {
-        #ifdef TELEGRAM_DEBUG  
-            Serial.println(F("Sending binary photo remaining buffer"));
-        #endif
-        client->write((const uint8_t *)buffer, count);
     }
 
     client->print(end_request);
