@@ -406,7 +406,7 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
 
 String UniversalTelegramBot::sendMultipartFormDataToTelegramByString(
     const String& command, const String& binaryPropertyName, const String& fileName,
-    const String& contentType, const String& chat_id, const char* content) {
+    const String& contentType, const String& chat_id, const String& content) {
 
   String body;
   String headers;
@@ -473,15 +473,7 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegramByString(
     #ifdef TELEGRAM_DEBUG  
         Serial.println(F("Sending multipar reqeuest by c-string"));
     #endif
-    byte buffer[512];
-    while (sizeof(content)) {
-        *(byte*)buffer = 0;
-        strncat(buffer, content, 512);
-        #ifdef TELEGRAM_DEBUG  
-            Serial.println(F("Sending binary photo full buffer"));
-        #endif
-        client->write((const uint8_t *)buffer, 512);
-    }
+    client->print(content)
 
     client->print(end_request);
     #ifdef TELEGRAM_DEBUG  
