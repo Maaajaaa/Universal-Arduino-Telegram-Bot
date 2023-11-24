@@ -473,7 +473,7 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegramByString(
     #ifdef TELEGRAM_DEBUG  
         Serial.println(F("Sending multipar reqeuest by c-string"));
     #endif
-    client->print(content)
+    client->print(content);
 
     client->print(end_request);
     #ifdef TELEGRAM_DEBUG  
