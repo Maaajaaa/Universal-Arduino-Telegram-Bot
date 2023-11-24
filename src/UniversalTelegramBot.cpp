@@ -404,7 +404,7 @@ String UniversalTelegramBot::sendMultipartFormDataToTelegram(
 }
 
 
-String UniversalTelegramBot::sendMultipartFormDataToTelegram(
+String UniversalTelegramBot::sendMultipartFormDataToTelegramByString(
     const String& command, const String& binaryPropertyName, const String& fileName,
     const String& contentType, const String& chat_id, const char& content) {
 
